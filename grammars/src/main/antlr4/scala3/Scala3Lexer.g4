@@ -72,10 +72,6 @@ PrintableChar
     : '\u0020' .. '\u007E'
     ;
 
-fragment PrintableCharExceptWhitespace
-    : '\u0021' .. '\u007F'
-    ;
-
 
 fragment UnicodeEscape
     : '\\' 'u' 'u'? HexDigit HexDigit HexDigit HexDigit
@@ -109,8 +105,8 @@ BoundVarid
     | '`' Varid '`'
     ;
 
-Plainid:
-    Alphaid
+Plainid
+    : Alphaid
    |  Op
    ;
 
