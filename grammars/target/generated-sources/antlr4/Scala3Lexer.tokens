@@ -1,0 +1,17 @@
+Id=1
+BooleanLiteral=2
+CharacterLiteral=3
+SymbolLiteral=4
+IntegerLiteral=5
+StringLiteral=6
+FloatingPointLiteral=7
+Varid=8
+BoundVarid=9
+Paren=10
+Delim=11
+Semi=12
+NL=13
+NEWLINE=14
+WS=15
+COMMENT=16
+LINE_COMMENT=17
