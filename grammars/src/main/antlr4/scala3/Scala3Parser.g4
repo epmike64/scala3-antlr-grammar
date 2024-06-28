@@ -11,6 +11,20 @@ options {
 
 //-- LITERALS AND PATHS ---------
 
+interpolatedString
+                 :  Alphaid '"' ('\\'? interpolatedStringPart | '\\' | '"')* '"'
+                   |  Alphaid '"""' ('"'? '"'?   ('"' | '$') | escape)* ('"')* '"""'
+                   ;
+
+interpolatedStringPart
+                 : PrintableChar  ('"' | '$' | '\\') | escape
+                 ;
+escape
+       :'$$'
+       |  '$"'
+       |  '$' Alphaid
+       |  '$' blockExpr
+       ;
 
 simpleLiteral
                 :  '-'? IntegerLiteral
@@ -23,6 +37,7 @@ simpleLiteral
 literal
         :  simpleLiteral
 //InterpolatedStringLiteral
+        | interpolatedString
         |  SymbolLiteral
         |  'null'
         ;

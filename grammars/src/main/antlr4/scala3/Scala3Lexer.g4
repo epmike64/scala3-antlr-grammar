@@ -94,32 +94,49 @@ fragment CharEscapeSeq
 fragment Op
     : '/'? Opchar+
     ;
-///////////////////////////////////////////////////////
+
+Varid
+    : Lower Idrest
+    ;
+BoundVarid
+    : Varid
+    | '`' Varid '`'
+    ;
+
+fragment Plainid
+   : Upper Idrest
+   | Lower Idrest
+   | Op
+   ;
+
 Id
     : Plainid
     | '`' (CharNoBackQuoteOrNewline | UnicodeEscape | CharEscapeSeq)+ '`'
     ;
 
-BooleanLiteral
-    : 'true'
-    | 'false'
+fragment Idrest
+  : (Letter | Digit)* ('_' Op)?
+  ;
+
+QuoteId
+    :'\'' Alphaid
     ;
 
-CharacterLiteral
-    : '\'' (PrintableChar | CharEscapeSeq) '\''
-    ;
-
-SymbolLiteral
-    : '\'' Plainid
+Spliceid
+    : '$' Alphaid
     ;
 
 IntegerLiteral
     : (DecimalNumeral | HexNumeral) ('L' | 'l')?
     ;
 
-StringLiteral
-    : '"' StringElement* '"'
-    | '"""' MultiLineChars '"""'
+fragment DecimalNumeral
+    : '0'
+    | NonZeroDigit Digit*
+    ;
+
+fragment HexNumeral
+    : '0' 'x' HexDigit HexDigit+
     ;
 
 FloatingPointLiteral
@@ -129,14 +146,67 @@ FloatingPointLiteral
     | Digit+ ExponentPart? FloatType
     ;
 
-Varid
-    : Lower Idrest
+fragment ExponentPart
+    : ('E' | 'e') ('+' | '-')? Digit+
     ;
 
-BoundVarid
-    : Varid
-    | '`' Varid '`'
+fragment FloatType
+    : 'F'
+    | 'f'
+    | 'D'
+    | 'd'
     ;
+
+ BooleanLiteral
+     : 'true'
+     | 'false'
+     ;
+
+CharacterLiteral
+    : '\'' (PrintableChar | CharEscapeSeq) '\''
+    ;
+
+StringLiteral
+    : '"' StringElement* '"'
+    | '"""' MultiLineChars '"""'
+    ;
+
+
+fragment StringElement
+    : '\u0020'
+    | '\u0021'
+    | '\u0023' .. '\u007F'
+    | CharEscapeSeq
+    ;
+
+fragment MultiLineChars
+    : (StringElement | NL)*
+    ;
+
+//InterpolatedString
+//                 :  Alphaid '"' ('\\'? InterpolatedStringPart | '\\' | '"')* '"'
+//                   |  Alphaid '"""' ('"'? '"'?   ('"' | '$') | escape)* ('"')* '"""'
+//                   ;
+//
+//fragment InterpolatedStringPart
+//                 : PrintableChar  ('"' | '$' | '\\') | escape
+//                 ;
+
+
+
+SymbolLiteral
+    : '\'' Plainid
+    ;
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -152,15 +222,6 @@ Alphaid
     : Upper Idrest
     |  Varid
     ;
-QuoteId
-    :'\'' Alphaid
-    ;
-
-Spliceid
-    : '$' Alphaid
-    ;
-
-
 
 Semi
     : (';' | (NL)+) -> skip
@@ -179,63 +240,13 @@ fragment CharNoBackQuoteOrNewline
 
 // fragments
 
-
-
-
-
-
-
-
-fragment Idrest
-    : (Letter | Digit)* ('_' Op)?
-    ;
-
-fragment StringElement
-    : '\u0020'
-    | '\u0021'
-    | '\u0023' .. '\u007F'
-    | CharEscapeSeq
-    ;
-
-fragment MultiLineChars
-    : (StringElement | NL)*
-    ;
-
-
-
-fragment FloatType
-    : 'F'
-    | 'f'
-    | 'D'
-    | 'd'
-    ;
-
-
-
-
-
 // and Unicode categories Lo, Lt, Nl
-
-fragment ExponentPart
-    : ('E' | 'e') ('+' | '-')? Digit+
-    ;
 
 
 
 fragment PrintableCharExceptWhitespace
     : '\u0021' .. '\u007F'
     ;
-
-
-fragment DecimalNumeral
-    : '0'
-    | NonZeroDigit Digit*
-    ;
-
-fragment HexNumeral
-    : '0' 'x' HexDigit HexDigit+
-    ;
-
 
 
 fragment NonZeroDigit
@@ -246,11 +257,7 @@ fragment VaridFragment
     : Varid
     ;
 
-fragment Plainid
-    : Upper Idrest
-    | Lower Idrest
-    | Op
-    ;
+
 
 //
 // Unicode categories
