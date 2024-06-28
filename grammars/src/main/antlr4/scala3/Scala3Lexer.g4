@@ -1,7 +1,6 @@
 lexer grammar Scala3Lexer;
 
 
-
 fragment WhiteSpace
     : '\u0020'
     | '\u0009'
@@ -24,13 +23,10 @@ fragment Lower
 fragment Letter
     : Upper
     | Lower
-//    | UnicodeClass_LO
-//    | UnicodeClass_LT // TODO Add category Nl
     ;
 
 fragment Digit
-    : '0'
-    | NonZeroDigit
+    : '0'.. '9'
     ;
 
 Paren
@@ -59,6 +55,7 @@ fragment Opchar
     | '*'
     | '+'
     | '-'
+    | '/'
     | ':'
     | '<'
     | '='
@@ -71,9 +68,14 @@ fragment Opchar
     | '~'
     ;
 
-fragment PrintableChar
-    : '\u0020' .. '\u007F'
+PrintableChar
+    : '\u0020' .. '\u007E'
     ;
+
+fragment PrintableCharExceptWhitespace
+    : '\u0021' .. '\u007F'
+    ;
+
 
 fragment UnicodeEscape
     : '\\' 'u' 'u'? HexDigit HexDigit HexDigit HexDigit
@@ -89,29 +91,41 @@ fragment CharEscapeSeq
     : '\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | '\'' | '\\')
     ;
 
-//escapeSeq ??
+EscapeSeq
+        : UnicodeEscape
+        | CharEscapeSeq
+        ;
 
-fragment Op
-    : '/'? Opchar+
+Op
+    : Opchar Opchar*
     ;
+
+//fragment Op
+//    : '/'? Opchar+
+//    ;
 
 Varid
     : Lower Idrest
     ;
+
 BoundVarid
     : Varid
     | '`' Varid '`'
     ;
 
-fragment Plainid
-   : Upper Idrest
-   | Lower Idrest
-   | Op
+//fragment Plainid
+//   : Upper Idrest
+//   | Lower Idrest
+//   | Op
+//   ;
+Plainid:
+    Alphaid
+   |  Op
    ;
 
 Id
     : Plainid
-    | '`' (CharNoBackQuoteOrNewline | UnicodeEscape | CharEscapeSeq)+ '`'
+    | '`' (CharNoBackQuoteOrNewline | EscapeSeq)* '`'
     ;
 
 fragment Idrest
@@ -132,22 +146,21 @@ IntegerLiteral
 
 fragment DecimalNumeral
     : '0'
-    | NonZeroDigit Digit*
+    | Digit ((Digit | '_')* Digit)?
     ;
 
 fragment HexNumeral
-    : '0' 'x' HexDigit HexDigit+
+    : '0' ('x' | 'X') HexDigit ((HexDigit | '_')* HexDigit)?
     ;
 
 FloatingPointLiteral
-    : Digit+ '.' Digit+ ExponentPart? FloatType?
-    | '.' Digit+ ExponentPart? FloatType?
-    | Digit ExponentPart FloatType?
-    | Digit+ ExponentPart? FloatType
-    ;
+                 :  DecimalNumeral? '.' Digit ((Digit | '_')* Digit) ExponentPart? FloatType?
+                   |  DecimalNumeral ExponentPart FloatType?
+                   |  DecimalNumeral FloatType
+                   ;
 
 fragment ExponentPart
-    : ('E' | 'e') ('+' | '-')? Digit+
+    : ('E' | 'e') ('+' | '-')? Digit ((Digit | '_')* Digit)?
     ;
 
 fragment FloatType
@@ -163,7 +176,7 @@ fragment FloatType
      ;
 
 CharacterLiteral
-    : '\'' (PrintableChar | CharEscapeSeq) '\''
+    : '\'' (PrintableChar | EscapeSeq) '\''    //characterLiteral ::=  ‘'’ (charNoQuoteOrNewline | escapeSeq) ‘'’
     ;
 
 StringLiteral
@@ -183,32 +196,10 @@ fragment MultiLineChars
     : (StringElement | NL)*
     ;
 
-//InterpolatedString
-//                 :  Alphaid '"' ('\\'? InterpolatedStringPart | '\\' | '"')* '"'
-//                   |  Alphaid '"""' ('"'? '"'?   ('"' | '$') | escape)* ('"')* '"""'
-//                   ;
-//
-//fragment InterpolatedStringPart
-//                 : PrintableChar  ('"' | '$' | '\\') | escape
-//                 ;
-
-
 
 SymbolLiteral
     : '\'' Plainid
     ;
-
-
-
-
-
-
-
-
-
-
-
-
 
 Indent
     : '\u0009'
@@ -241,24 +232,6 @@ fragment CharNoBackQuoteOrNewline
 // fragments
 
 // and Unicode categories Lo, Lt, Nl
-
-
-
-fragment PrintableCharExceptWhitespace
-    : '\u0021' .. '\u007F'
-    ;
-
-
-fragment NonZeroDigit
-    : '1' .. '9'
-    ;
-
-fragment VaridFragment
-    : Varid
-    ;
-
-
-
 //
 // Unicode categories
 // https://github.com/antlr/grammars-v4/blob/master/stringtemplate/LexUnicode.g4
