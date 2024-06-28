@@ -97,12 +97,8 @@ EscapeSeq
         ;
 
 Op
-    : Opchar Opchar*
+    : Opchar+
     ;
-
-//fragment Op
-//    : '/'? Opchar+
-//    ;
 
 Varid
     : Lower Idrest
@@ -113,11 +109,6 @@ BoundVarid
     | '`' Varid '`'
     ;
 
-//fragment Plainid
-//   : Upper Idrest
-//   | Lower Idrest
-//   | Op
-//   ;
 Plainid:
     Alphaid
    |  Op
