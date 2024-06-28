@@ -3,11 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.flint</groupId>
-  <artifactId>my-antlr-grammars</artifactId>
+  <artifactId>scala3-antlr-grammar</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>my-antlr-grammars</name>
+  <name>scala3-antlr-grammar</name>
   <url>http://maven.apache.org</url>
   <modules>
     <module>grammars</module>

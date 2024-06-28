@@ -22,27 +22,27 @@ simpleLiteral
 
 literal
         :  simpleLiteral
-        |  InterpolatedStringLiteral
+//InterpolatedStringLiteral
         |  SymbolLiteral
         |  'null'
         ;
 
 qualId
-        :  ID ('.' ID)*
+        :  Id ('.' Id)*
         ;
 
 ids
-        :  ID (',' ID)*
+        :  Id (',' Id)*
         ;
 
 simpleRef
-        :  ID
-        |  (ID '.')? 'this'
-        |  (ID '.')? 'super' classQualifier? '.' ID
+        :  Id
+        |  (Id '.')? 'this'
+        |  (Id '.')? 'super' classQualifier? '.' Id
         ;
 
 classQualifier
-        :  '[' ID ']'
+        :  '[' Id ']'
         ;
 
 //---- TYPES -----
@@ -71,15 +71,15 @@ funParamClause
         ;
 
 typedFunParam
-        :  ID ':' type
+        :  Id ':' type
         ;
 
 matchType
-        :  infixType 'match' ('{' typeCaseClauses '}' | INDENT typeCaseClauses OUTDENT)
+        :  infixType 'match' ('{' typeCaseClauses '}' | Indent typeCaseClauses Outdent)
         ;
 
 infixType
-        :  refinedType (ID NL? refinedType)*
+        :  refinedType (Id NL? refinedType)*
         ;
 
 refinedType
@@ -98,20 +98,20 @@ simpleType
         ;
 
 simpleType1
-       :  ID                                                     //  Ident(name)
-        |  singleton '.' ID                                        // Select(t, name)
+       :  Id                                                     //  Ident(name)
+        |  singleton '.' Id                                        // Select(t, name)
         |  singleton '.' 'type'                                    // SingletonTypeTree(p)
         |  '(' types ')'                                           // Tuple(ts)
         |  refinement                                             //  RefinedTypeTree(EmptyTree, refinement)
         |  typeSplice                                               //-- deprecated syntax
         |  simpleType1 typeArgs                               //      AppliedTypeTree(t, args)
-        |  simpleType1 '#' ID
+        |  simpleType1 '#' Id
         ;
 
 singleton
         :  simpleRef
         |  simpleLiteral
-        |  singleton '.' ID
+        |  singleton '.' Id
         ;
 
 funArgType
@@ -141,7 +141,7 @@ refinement_
 
 refinement
             :  NL? '{' refinement_ '}'
-            | COLON INDENT refinement_ OUTDENT
+            | ':' Indent refinement_ Outdent
             ;
 
 typeBounds
@@ -173,7 +173,7 @@ blockResult
 
 funParams
             :  bindings
-            |   ID
+            |   Id
             |  '_'
             ;
 
@@ -187,7 +187,7 @@ expr1
         |  'throw' expr
         |  'return' expr?
         |  forExpr
-        |  (simpleExpr '.')? ID '=' expr
+        |  (simpleExpr '.')? Id '=' expr
         |  prefixOperator simpleExpr '=' expr
         |  simpleExpr argumentExprs '=' expr
         |  postfixExpr ascription?
@@ -204,18 +204,18 @@ catches
         ;
 
 postfixExpr
-            :  infixExpr ID?                                         //-- only if language.postfixOperators is enabled
+            :  infixExpr Id?                                         //-- only if language.postfixOperators is enabled
             ;
 
 infixExpr
             :  prefixExpr
-            |  infixExpr ID NL? infixExpr
-            |  infixExpr ID colonArgument
+            |  infixExpr Id NL? infixExpr
+            |  infixExpr Id colonArgument
             |  infixExpr matchClause
             ;
 
 matchClause
-            :  'match' ( '{' caseClauses '}' | INDENT caseClauses OUTDENT )
+            :  'match' ( '{' caseClauses '}' | Indent caseClauses Outdent )
             ;
 
 prefixExpr
@@ -233,11 +233,11 @@ simpleExpr
             |  blockExpr
             |  exprSplice
             |  quoted
-            |  QUOTEID                                                 // -- only inside splices
+            |  QuoteId                                                 // -- only inside splices
             |  'new' constrApp ('with' constrApp)* templateBody?
             |  'new' templateBody
             |  '(' exprsInParens ')'
-            |  simpleExpr '.' ID
+            |  simpleExpr '.' Id
             |  simpleExpr '.' matchClause
             |  simpleExpr typeArgs
             |  simpleExpr argumentExprs
@@ -245,7 +245,7 @@ simpleExpr
             ;
 
 colonArgument
-            :  COLON LambdaStart? INDENT (caseClauses | block) OUTDENT
+            :  ':' lambdaStart? Indent (caseClauses | block) Outdent
             ;
 
 lambdaStart
@@ -261,13 +261,13 @@ quoted
 
 
  exprSplice
-        : SPLICEID                                                  //-- if inside quoted block
+        : Spliceid                                                  //-- if inside quoted block
          |  '$' '{' block '}'                                      //  -- unless inside quoted pattern
          |  '$' '{' pattern '}'                                     // -- when inside quoted pattern
          ;
 
 typeSplice
-        :SPLICEID                                               //   -- if inside quoted type -- deprecated syntax
+        :Spliceid                                               //   -- if inside quoted type -- deprecated syntax
         |  '$' '{' block '}'                                        //-- unless inside quoted type pattern -- deprecated syntax
         |  '$' '{' pattern '}'
         ;
@@ -299,7 +299,7 @@ blockExpr_
 
  blockExpr
         :  '{' blockExpr_ '}'
-        |  INDENT blockExpr_ OUTDENT
+        |  Indent blockExpr_ Outdent
         ;
 
 block
@@ -382,11 +382,11 @@ typeCaseClause
          ;
 
  pattern2
-        :  (ID '@')? infixPattern
+        :  (Id '@')? infixPattern
         ;
 
 infixPattern
-        :  simplePattern ( ID NL? simplePattern )*
+        :  simplePattern ( Id NL? simplePattern )*
         ;
 
  simplePattern
@@ -400,11 +400,11 @@ infixPattern
 
  simplePattern1
         :  simpleRef
-         |  simplePattern1 '.' ID
+         |  simplePattern1 '.' Id
          ;
 
  patVar
-           :  VARID
+           :  Varid
          |  '_'
          ;
 
@@ -424,7 +424,7 @@ clsTypeParamClause
                 ;
 
 clsTypeParam
-            :  annotation* ('+' | '-')? ID hkTypeParamClause? typeParamBounds
+            :  annotation* ('+' | '-')? Id hkTypeParamClause? typeParamBounds
             ;
 
 typTypeParamClause
@@ -432,7 +432,7 @@ typTypeParamClause
             ;
 
 typTypeParam
-            :  annotation* ID hkTypeParamClause? typeBounds
+            :  annotation* Id hkTypeParamClause? typeBounds
             ;
 
 hkTypeParamClause
@@ -440,7 +440,7 @@ hkTypeParamClause
             ;
 
 hkTypeParam
-            :  annotation* ('+' | '-')? (ID hkTypeParamClause? | '_') typeBounds
+            :  annotation* ('+' | '-')? (Id hkTypeParamClause? | '_') typeBounds
             ;
 
 
@@ -458,7 +458,7 @@ clsParams
             ;
 
 clsParam
-            :  annotation* (modifier* ('val' | 'var'))? param
+            :  annotation* (modifier* ('val' | 'var') | 'inline' )? param
             ;
 
 defParamClauses
@@ -485,7 +485,7 @@ defTypeParamClause
             ;
 
 defTypeParam
-            :  annotation* ID hkTypeParamClause? typeParamBounds
+            :  annotation* Id hkTypeParamClause? typeParamBounds
             ;
 
 
@@ -512,7 +512,7 @@ defTermParam
             ;
 
 param
-        :  ID ':' paramType ('=' expr)?
+        :  Id ':' paramType ('=' expr)?
         ;
 
 //---Bindings and Imports
@@ -522,7 +522,7 @@ bindings
         ;
 
 binding
-            :  (ID | '_') (':' type)?
+            :  (Id | '_') (':' type)?
             ;
 
 modifier
@@ -549,7 +549,7 @@ accessModifier
             ;
 
 accessQualifier
-            :  '[' ID ']'
+            :  '[' Id ']'
             ;
 
 annotation
@@ -565,8 +565,8 @@ export
             ;
 
 importExpr
-            :  simpleRef ('.' ID)* '.' importSpec
-            |  simpleRef 'as' ID
+            :  simpleRef ('.' Id)* '.' importSpec
+            |  simpleRef 'as' Id
             ;
 
 
@@ -578,7 +578,7 @@ importSpec
 
 
 namedSelector
-            :  ID ('as' (ID | '_'))?
+            :  Id ('as' (Id | '_'))?
             ;
 
 wildCardSelector
@@ -595,7 +595,7 @@ endMarker
             ;
 
 endMarkerTag
-                :  ID | 'if' | 'while' | 'for' | 'match' | 'try'
+                :  Id | 'if' | 'while' | 'for' | 'match' | 'try'
                     |  'new' | 'this' | 'given' | 'extension' | 'val'
              ;
 
@@ -635,11 +635,11 @@ defDef
             ;
 
 defSig
-       :  ID defParamClauses? defImplicitClause?
+       :  Id defParamClauses? defImplicitClause?
        ;
 
 typeDef
-       :  ID hkTypeParamClause? (funParamClause)* typeBounds  ('=' type)?
+       :  Id hkTypeParamClause? (funParamClause)* typeBounds  ('=' type)?
        ;
 
 tmplDef
@@ -650,7 +650,7 @@ tmplDef
             ;
 
 classDef
-            :  ID classConstr template?
+            :  Id classConstr template?
             ;
 
 classConstr
@@ -662,11 +662,11 @@ constrMods
             ;
 
 objectDef
-            :  ID template?
+            :  Id template?
             ;
 
 enumDef
-            :  ID classConstr inheritClauses enumBody
+            :  Id classConstr inheritClauses enumBody
             ;
 
 givenDef
@@ -674,8 +674,8 @@ givenDef
             ;
 
 givenSig
-            :  ID? defTypeParamClause? usingParamClause* ':'
-            ;       // -- one of `ID`, `defTypeParamClause`, `usingParamClause` must be present
+            :  Id? defTypeParamClause? usingParamClause* ':'
+            ;       // -- one of `Id`, `defTypeParamClause`, `usingParamClause` must be present
 
 structuralInstance
             :  constrApp ('with' constrApp)* ('with' withTemplateBody)?
@@ -691,7 +691,7 @@ extMethods_
         ;
 
 extMethods
-            :  extMethod | NL?  ( '{' extMethods_ '}' | INDENT extMethods_ OUTDENT )
+            :  extMethod | NL?  ( '{' extMethods_ '}' | Indent extMethods_ Outdent )
             ;
 
 extMethod
@@ -721,7 +721,7 @@ constrExpr_
 
 constrExpr
         :  selfInvocation
-        |  ('{' constrExpr_ '}' | INDENT constrExpr_ OUTDENT)
+        |  ('{' constrExpr_ '}' | Indent constrExpr_ Outdent)
         ;
 
 
@@ -730,17 +730,17 @@ selfInvocation
         ;
 
 templateBody_
-             : selfType? templateStat (Semi templateStat)
+             : selfType? templateStat (Semi templateStat)*
              ;
 
 withTemplateBody
             : '{' templateBody_ '}'
-            | INDENT templateBody_ OUTDENT
+            | Indent templateBody_ Outdent
             ;
 
 templateBody:
             NL? '{' templateBody_ '}'
-            | COLON INDENT templateBody_ OUTDENT
+            | ':' Indent templateBody_ Outdent
             ;
 
 templateStat
@@ -753,7 +753,7 @@ templateStat
             ;
 
 selfType
-            :  ID (':' infixType)? '=>'
+            :  Id (':' infixType)? '=>'
             |  'this' ':' infixType '=>'
             ;
 
@@ -763,7 +763,7 @@ enumBody_
 
 enumBody
     :  NL?  enumBody_
-    | COLON INDENT enumBody_ OUTDENT
+    | ':' Indent enumBody_ Outdent
     ;
 
 enumStat
@@ -772,7 +772,7 @@ enumStat
             ;
 
 enumCase
-            :  'case' (ID classConstr ('extends' constrApps)? | ids);
+            :  'case' (Id classConstr ('extends' constrApps)? | ids);
 
 topStats
             :  topStat (Semi topStat)*
@@ -789,7 +789,7 @@ topStat
             ;
 
 packaging
-            :  'package' qualId NL? ( NL? '{' topStats '}' | COLON INDENT topStats OUTDENT)
+            :  'package' qualId NL? ( NL? '{' topStats '}' | ':' Indent topStats Outdent)
             ;
 
 packageObject

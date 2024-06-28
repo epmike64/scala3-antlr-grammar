@@ -2,10 +2,99 @@ lexer grammar Scala3Lexer;
 
 
 
+fragment WhiteSpace
+    : '\u0020'
+    | '\u0009'
+    | '\u000D'
+    | '\u000A'
+    ;
 
-// Lexer
+fragment Upper
+    : 'A' .. 'Z'
+    | '$'
+    | UnicodeClass_LU
+    ;
 
+fragment Lower
+    : 'a' .. 'z'
+    | '_'
+    | UnicodeClass_LL
+    ;
 
+fragment Letter
+    : Upper
+    | Lower
+//    | UnicodeClass_LO
+//    | UnicodeClass_LT // TODO Add category Nl
+    ;
+
+fragment Digit
+    : '0'
+    | NonZeroDigit
+    ;
+
+Paren
+   : '('
+   | ')'
+   | '['
+   | ']'
+   | '{'
+   | '}'
+   ;
+
+Delim
+    : '`'
+    | '\''
+    | '"'
+    | '.'
+    | ';'
+    | ','
+    ;
+
+fragment Opchar
+    : '!'
+    | '#'
+    | '%'
+    | '&'
+    | '*'
+    | '+'
+    | '-'
+    | ':'
+    | '<'
+    | '='
+    | '>'
+    | '?'
+    | '@'
+    | '\\'
+    | '^'
+    | '|'
+    | '~'
+    ;
+
+fragment PrintableChar
+    : '\u0020' .. '\u007F'
+    ;
+
+fragment UnicodeEscape
+    : '\\' 'u' 'u'? HexDigit HexDigit HexDigit HexDigit
+    ;
+
+fragment HexDigit
+    : '0' .. '9'
+    | 'A' .. 'F'
+    | 'a' .. 'f'
+    ;
+
+fragment CharEscapeSeq
+    : '\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | '\'' | '\\')
+    ;
+
+//escapeSeq ??
+
+fragment Op
+    : '/'? Opchar+
+    ;
+///////////////////////////////////////////////////////
 Id
     : Plainid
     | '`' (CharNoBackQuoteOrNewline | UnicodeEscape | CharEscapeSeq)+ '`'
@@ -49,23 +138,29 @@ BoundVarid
     | '`' Varid '`'
     ;
 
-Paren
-    : '('
-    | ')'
-    | '['
-    | ']'
-    | '{'
-    | '}'
+
+
+Indent
+    : '\u0009'
     ;
 
-Delim
-    : '`'
-    | '\''
-    | '"'
-    | '.'
-    | ';'
-    | ','
+Outdent
+    : '\u0008'
     ;
+
+Alphaid
+    : Upper Idrest
+    |  Varid
+    ;
+QuoteId
+    :'\'' Alphaid
+    ;
+
+Spliceid
+    : '$' Alphaid
+    ;
+
+
 
 Semi
     : (';' | (NL)+) -> skip
@@ -84,40 +179,12 @@ fragment CharNoBackQuoteOrNewline
 
 // fragments
 
-fragment UnicodeEscape
-    : '\\' 'u' 'u'? HexDigit HexDigit HexDigit HexDigit
-    ;
 
-fragment WhiteSpace
-    : '\u0020'
-    | '\u0009'
-    | '\u000D'
-    | '\u000A'
-    ;
 
-fragment Opchar
-    : '!'
-    | '#'
-    | '%'
-    | '&'
-    | '*'
-    | '+'
-    | '-'
-    | ':'
-    | '<'
-    | '='
-    | '>'
-    | '?'
-    | '@'
-    | '\\'
-    | '^'
-    | '|'
-    | '~'
-    ;
 
-fragment Op
-    : '/'? Opchar+
-    ;
+
+
+
 
 fragment Idrest
     : (Letter | Digit)* ('_' Op)?
@@ -134,11 +201,7 @@ fragment MultiLineChars
     : (StringElement | NL)*
     ;
 
-fragment HexDigit
-    : '0' .. '9'
-    | 'A' .. 'F'
-    | 'a' .. 'f'
-    ;
+
 
 fragment FloatType
     : 'F'
@@ -147,24 +210,9 @@ fragment FloatType
     | 'd'
     ;
 
-fragment Upper
-    : 'A' .. 'Z'
-    | '$'
-    | '_'
-    | UnicodeClass_LU
-    ;
 
-fragment Lower
-    : 'a' .. 'z'
-    | UnicodeClass_LL
-    ;
 
-fragment Letter
-    : Upper
-    | Lower
-    | UnicodeClass_LO
-    | UnicodeClass_LT // TODO Add category Nl
-    ;
+
 
 // and Unicode categories Lo, Lt, Nl
 
@@ -172,17 +220,12 @@ fragment ExponentPart
     : ('E' | 'e') ('+' | '-')? Digit+
     ;
 
-fragment PrintableChar
-    : '\u0020' .. '\u007F'
-    ;
+
 
 fragment PrintableCharExceptWhitespace
     : '\u0021' .. '\u007F'
     ;
 
-fragment CharEscapeSeq
-    : '\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | '\'' | '\\')
-    ;
 
 fragment DecimalNumeral
     : '0'
@@ -193,10 +236,7 @@ fragment HexNumeral
     : '0' 'x' HexDigit HexDigit+
     ;
 
-fragment Digit
-    : '0'
-    | NonZeroDigit
-    ;
+
 
 fragment NonZeroDigit
     : '1' .. '9'
